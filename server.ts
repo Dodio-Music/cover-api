@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import multipart from "@fastify/multipart";
+import formbody from "@fastify/formbody";
 import path from "node:path";
 import * as fs from "node:fs";
 import {configDotenv} from "dotenv";
@@ -23,6 +24,7 @@ const fastify = Fastify({logger: true});
 fastify.register(multipart, {
     limits: {fileSize: 10_000_000, files: 1}
 });
+fastify.register(formbody);
 
 fastify.post("/", async (req, reply) => {
     const token = req.headers["x-upload-token"];
