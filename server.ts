@@ -24,7 +24,7 @@ fastify.register(multipart, {
     limits: {fileSize: 10_000_000, files: 1}
 });
 
-fastify.post("/dodio/cover", async (req, reply) => {
+fastify.post("/", async (req, reply) => {
     const token = req.headers["x-upload-token"];
     if (token !== TOKEN) {
         return reply.status(401).send({success: false, error: "Invalid token"});
@@ -75,7 +75,7 @@ fastify.post("/dodio/cover", async (req, reply) => {
     });
 });
 
-fastify.delete("/dodio/cover/:filename", async (req, reply) => {
+fastify.delete("/:filename", async (req, reply) => {
     const token = req.headers["x-upload-token"];
     if (token !== TOKEN) {
         return reply.status(401).send({ success: false, error: "Invalid token" });
