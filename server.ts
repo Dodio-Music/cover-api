@@ -67,11 +67,7 @@ fastify.post("/", async (req, reply) => {
 
     return reply.send({
         success: true,
-        variants: {
-            original: `/dodio/covers/original/${data.filename}`,
-            sizeLow: `/dodio/covers/sizeMid/${data.filename}`,
-            sizeMid: `/dodio/covers/sizeMid/${data.filename}`
-        }
+        file: `${data.filename}`
     });
 });
 
