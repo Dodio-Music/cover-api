@@ -14,15 +14,16 @@ const TOKEN = process.env.COVER_API_KEY!;
 const DIR_ORIGINAL = path.join(UPLOAD_DIR, "original");
 const DIR_MID = path.join(UPLOAD_DIR, "mid");
 const DIR_LOW = path.join(UPLOAD_DIR, "low");
+const DIR_THUMB = path.join(UPLOAD_DIR, "thumb");
 
-[DIR_ORIGINAL, DIR_MID, DIR_LOW].forEach((dir) => {
+[DIR_ORIGINAL, DIR_MID, DIR_LOW, DIR_THUMB].forEach((dir) => {
     fs.mkdirSync(dir, {recursive: true});
 });
 
 const fastify = Fastify({logger: true});
 
 fastify.register(multipart, {
-    limits: {fileSize: 10_000_000, files: 1}
+    limits: {fileSize: 20_000_000, files: 1}
 });
 fastify.register(formbody);
 
@@ -42,7 +43,7 @@ fastify.post("/", async (req, reply) => {
     }
 
     if (data.file.truncated) {
-        return reply.status(400).send({success: false, error: "File too big! Cover should be smaller than 10MB."});
+        return reply.status(400).send({success: false, error: "File too big! Should be smaller than 20MB."});
     }
 
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
@@ -63,9 +64,11 @@ fastify.post("/", async (req, reply) => {
 
     const outMid = path.join(DIR_MID, data.filename);
     const outLow = path.join(DIR_LOW, data.filename);
+    const outThumb = path.join(DIR_THUMB, data.filename);
 
     await sharp(buffer).resize(768, 768).toFile(outMid);
     await sharp(buffer).resize(384, 384).toFile(outLow);
+    await sharp(buffer).resize(96, 96).jpeg({ quality: 85 }).toFile(outThumb);
 
     return reply.send({
         success: true,
@@ -84,7 +87,8 @@ fastify.delete("/:filename", async (req, reply) => {
     const paths = [
         path.join(DIR_ORIGINAL, filename),
         path.join(DIR_LOW, filename),
-        path.join(DIR_MID, filename)
+        path.join(DIR_MID, filename),
+        path.join(DIR_THUMB)
     ];
 
     let deleted = 0;
